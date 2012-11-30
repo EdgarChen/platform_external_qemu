@@ -12,6 +12,7 @@
 #include "android/utils/debug.h"
 #include "qemu-common.h"
 #include "sim_card.h"
+#include "stk.h"
 #include <string.h>
 #include <assert.h>
 #include <stdio.h>

@@ -579,6 +579,7 @@ TELEPHONY_SOURCES := \
     sim_card.c \
     sysdeps_qemu.c \
     sms.c \
+    stk.c \
     remote_call.c
 
 common_LOCAL_SRC_FILES += $(TELEPHONY_SOURCES:%=telephony/%)

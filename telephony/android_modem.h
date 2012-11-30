@@ -14,6 +14,7 @@
 
 #include "sim_card.h"
 #include "sms.h"
+#include "stk.h"
 
 /** MODEM OBJECT
  **/
@@ -53,6 +54,10 @@ extern void         amodem_set_signal_strength( AModem modem, int rssi, int ber 
 /** SIM CARD STATUS
  **/
 extern ASimCard    amodem_get_sim( AModem  modem );
+
+/** STK Handler
+ **/
+extern AStk        amodem_get_stk( AModem modem );
 
 /** VOICE AND DATA NETWORK REGISTRATION
  **/
@@ -186,6 +191,7 @@ extern int    amodem_update_call( AModem  modem, const char*  number, ACallState
 extern int    amodem_disconnect_call( AModem  modem, const char*  number );
 extern int    amodem_remote_call_busy( AModem  modem, const char*  number );
 extern void   amodem_send_stk_unsol_proactive_command( AModem  modem, const char*  stkCmdPdu );
+extern void   amodem_send_stk_unsol_session_end_command( AModem modem, const char* stkCmdPdu );
 
 /** Cell Location
  **/

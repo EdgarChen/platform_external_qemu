@@ -1325,7 +1325,7 @@ gsm_check_number( char*  args )
 }
 
 static int
-do_send_stkCmd( ControlClient  client, char*  args  )
+do_stk_send_proactive( ControlClient  client, char*  args  )
 {
     if (!args) {
         control_write( client, "KO: missing argument, try 'stk pdu <hexstring>'\r\n" );
@@ -1338,6 +1338,27 @@ do_send_stkCmd( ControlClient  client, char*  args  )
     }
 
     amodem_send_stk_unsol_proactive_command( client->modem, args );
+    return 0;
+}
+
+static int
+do_stk_send_sessionend( ControlClient client, char* args )
+{
+    amodem_send_stk_unsol_session_end_command( client->modem, args );
+    return 0;
+}
+
+static int
+do_stk_list( ControlClient client, char* args )
+{
+    AStk android_stk = amodem_get_stk( client->modem );
+    int count = astk_get_proactive_command_count( android_stk );
+    int nn;
+    for (nn = 0; nn < count; nn++) {
+        AStkProactiveCmd command = astk_get_proactive_command( android_stk, nn );
+
+        control_write( client, "proactive %s\r\n", command->pdu);
+    }
     return 0;
 }
 
@@ -1793,7 +1814,15 @@ static const CommandDefRec stk_commands[] =
 {
     { "pdu", "issue stk proactive command",
     "'stk pdu <hexstring>' allows you to issue stk PDU to simulate an unsolicted proactive command \r\n", NULL,
-    do_send_stkCmd, NULL },
+    do_stk_send_proactive, NULL },
+
+    { "sessionend", "issue stk session end command",
+    "'stk sessionend' allows you to issue stk session end to simulate a unsolicte session end command \r\n'", NULL,
+    do_stk_send_sessionend, NULL },
+
+    { "list", "list current proactive commands which are waiting terminal response",
+    "'stk list' lists all proactive commands which are waiiting terminal response\r\n", NULL,
+    do_stk_list, NULL },
 
     { NULL, NULL, NULL, NULL, NULL, NULL }
 };

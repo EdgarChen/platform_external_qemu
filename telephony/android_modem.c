@@ -30,6 +30,7 @@
 #include <stdio.h>
 #include "sms.h"
 #include "remote_call.h"
+#include "stk.h"
 
 #define  DEBUG  1
 
@@ -248,6 +249,9 @@ typedef struct AModemRec_
 
     /* SIM card */
     ASimCard      sim;
+
+    /* Stk handler */
+    AStk          stk;
 
     /* voice and data network registration */
     ARegistrationUnsolMode   voice_mode;
@@ -629,6 +633,8 @@ amodem_create( int  base_port, int instance_id, AModemUnsolFunc  unsol_func, voi
 
     modem->sim = asimcard_create(base_port, instance_id);
 
+    modem->stk = astk_create(base_port, instance_id);
+
     // We don't know the exact number of instances to create here, it's
     // controlled by modem_driver_init(). Putting -1 here and register_savevm()
     // will assign a correct SaveStateEntry instance_id for us.
@@ -663,6 +669,9 @@ amodem_destroy( AModem  modem )
 {
     asimcard_destroy( modem->sim );
     modem->sim = NULL;
+
+    astk_destroy( modem-> stk );
+    modem->stk = NULL;
 }
 
 
@@ -692,6 +701,12 @@ ASimCard
 amodem_get_sim( AModem  modem )
 {
     return  modem->sim;
+}
+
+AStk
+amodem_get_stk( AModem modem )
+{
+    return modem->stk;
 }
 
 ARegistrationState
@@ -956,8 +971,15 @@ amodem_find_call( AModem  modem, int  id )
 void
 amodem_send_stk_unsol_proactive_command( AModem  modem, const char* stkCmdPdu )
 {
-   amodem_unsol( modem, "+CUSATP: %s\r",
+    astk_process_proactive_command( modem->stk, stkCmdPdu);
+    amodem_unsol( modem, "+CUSATP: %s\r",
                           stkCmdPdu); //string type in hexadecimal character format
+}
+
+void
+amodem_send_stk_unsol_session_end_command( AModem modem, const char* stkCmdPdu )
+{
+    amodem_unsol( modem, "+CUSATEND\r");
 }
 
 static void
@@ -1966,6 +1988,13 @@ handleLastCallFailCause( const char* cmd, AModem modem )
     return amodem_end_line( modem );
 }
 
+static const char*
+handleStkCommand( const char* cmd, AModem modem )
+{
+    astk_process_command( modem->stk, cmd );
+    return NULL;
+}
+
 /* Add a(n unsolicited) time response.
  *
  * retrieve the current time and zone in a format suitable
@@ -2575,6 +2604,9 @@ static const struct {
     { "+CMGF=0", NULL, handleEndOfInit },  /* now is a goof time to send the current tme and timezone */
     { "%CPI=3", NULL, NULL },
     { "%CSTAT=1", NULL, NULL },
+
+    /* stk related command */
+    { "!+CUSATT=", NULL, handleStkCommand },
 
     /* end of list */
     {NULL, NULL, NULL}
