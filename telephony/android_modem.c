@@ -21,6 +21,7 @@
 #include "android/utils/path.h"
 #include "hw/hw.h"
 #include "qemu-common.h"
+#include "qemu-thread.h"
 #include "sim_card.h"
 #include "supplementary_service.h"
 #include "sysdeps.h"
@@ -405,6 +406,7 @@ typedef struct AModemRec_
 
     SmsReceiver         sms_receiver;
 
+    QemuMutex           out_mutex;
     int                 out_size;
     char                out_buff[1024];
 
@@ -826,6 +828,8 @@ amodem_create( int  base_port, int instance_id, AModemUnsolFunc  unsol_func, voi
     modem->sim = asimcard_create(base_port, instance_id);
     modem->supplementary = asupplementary_create(base_port, instance_id);
 
+    qemu_mutex_init(&modem->out_mutex);
+
     // We don't know the exact number of instances to create here, it's
     // controlled by modem_driver_init(). Putting -1 here and register_savevm()
     // will assign a correct SaveStateEntry instance_id for us.
@@ -876,6 +880,8 @@ amodem_set_legacy( AModem  modem )
 void
 amodem_destroy( AModem  modem )
 {
+    qemu_mutex_destroy(&modem->out_mutex);
+
     asimcard_destroy( modem->sim );
     modem->sim = NULL;
 
