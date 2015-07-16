@@ -586,7 +586,7 @@ $(call start-emulator-library, emulator-libqemu)
 # gdbstub-xml.c contains C-compilable arrays corresponding to the content
 # of $(LOCAL_PATH)/gdb-xml/, and is generated with the 'feature_to_c.sh' script.
 #
-intermediates = $(call intermediates-dir-for,STATIC_LIBRARIES,$(LOCAL_MODULE),true,,$(HOST_2ND_ARCH_VAR_PREFIX))
+intermediates = $(call intermediates-dir-for,STATIC_LIBRARIES,$(LOCAL_MODULE),true)
 QEMU_GDBSTUB_XML_C = $(intermediates)/gdbstub-xml.c
 $(QEMU_GDBSTUB_XML_C): PRIVATE_PATH := $(LOCAL_PATH)
 $(QEMU_GDBSTUB_XML_C): PRIVATE_SOURCES := $(TARGET_XML_SOURCES)
@@ -606,7 +606,7 @@ $(call start-emulator64-library, emulator64-libqemu)
 # gdbstub-xml.c contains C-compilable arrays corresponding to the content
 # of $(LOCAL_PATH)/gdb-xml/, and is generated with the 'feature_to_c.sh' script.
 #
-intermediates = $(call intermediates-dir-for,STATIC_LIBRARIES,$(LOCAL_MODULE),true,,$(HOST_2ND_ARCH_VAR_PREFIX))
+intermediates = $(call intermediates-dir-for,STATIC_LIBRARIES,$(LOCAL_MODULE),true)
 QEMU_GDBSTUB_XML_C = $(intermediates)/gdbstub-xml.c
 $(QEMU_GDBSTUB_XML_C): PRIVATE_PATH := $(LOCAL_PATH)
 $(QEMU_GDBSTUB_XML_C): PRIVATE_SOURCES := $(TARGET_XML_SOURCES)
