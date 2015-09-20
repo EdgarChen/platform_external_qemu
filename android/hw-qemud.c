@@ -23,6 +23,7 @@
 #include "utils/panic.h"
 
 #define  D(...)    VERBOSE_PRINT(qemud,__VA_ARGS__)
+#define  E(...)    VERBOSE_PRINT(edgar,__VA_ARGS__)
 #define  D_ACTIVE  VERBOSE_CHECK(qemud)
 
 /* the T(...) macro is used to dump traffic */
@@ -2093,6 +2094,7 @@ static void
 _qemudPipe_wakeOn(void* opaque, int flags)
 {
     D("%s: -> %X", __FUNCTION__, flags);
+    E("%s: -> %X", __FUNCTION__, flags);
 }
 
 static void
